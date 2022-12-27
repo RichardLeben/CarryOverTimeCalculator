@@ -1,0 +1,65 @@
+<html>
+
+<head>
+  <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+</head>
+
+<body>
+  <title>持ち越し計算-れーべんの金玉</title>
+  <h1>持ち越し計算-れーべんの金玉</h1>
+  <fieldset>
+    <legend>HP</legend>
+    <input type="number" id="hp" min="0">
+  </fieldset>
+  <fieldset id="damages">
+    <legend>ダメージ</legend>
+    <button onclick="calc()">計算</button><button onclick="add()">+</button>
+    <div class="wrapper">
+      <input type="number" class="damage" min="0"><button onclick="remove(this)">-</button>
+    </div>
+  </fieldset>
+  <fieldset>
+    <legend>結果</legend>
+    <div id="result" style="white-space:pre"></div>
+  </fieldset>
+  <script>
+    const add = () => {
+      const damageWrapper = jQuery("<div></div>", { class: "wrapper" });
+      const damageInput = jQuery("<input />", { type: "number", class: "damage", min: "0" });
+      const damageRemover = jQuery("<button></button>", { text: "-", onclick: "remove(this)" });
+      damageInput.appendTo(damageWrapper);
+      damageRemover.appendTo(damageWrapper);
+      damageWrapper.appendTo("#damages");
+    };
+    const remove = (element) => {
+      jQuery(element).parent("div").remove();
+    };
+    const calc = () => {
+      let hp = $("#hp").val();
+      const damages = $(".damage").map((_, elm) => elm.value).get();
+      const results = damages.map((damage) => {
+        let result = '';
+        if (damage) {
+          if (hp <= 0) {
+            return '討伐済み'
+          }
+          const diff = hp - damage;
+          if (diff > 0) {
+            result = `残HP ${diff}`;
+          } else {
+            const virtualTime = Math.ceil(90 - (hp / (damage / 90)) + 20);
+            const time = virtualTime > 90 ? 90 : virtualTime;
+            result = `持越 ${time}秒`;
+          }
+          hp = diff;
+          return result;
+        } else {
+          return '入力が空';
+        }
+      });
+      jQuery("#result").html(results.join('\n'));
+    }
+  </script>
+</body>
+
+</html>
